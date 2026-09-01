@@ -1,0 +1,60 @@
+@model BookingManagement.MVC.Models.Bookings.DashboardViewModel
+
+@if (!Model.Search.HasResourceId)
+{
+    <p class="text-muted mb-0">Enter a resource ID and search to list its bookings.</p>
+}
+else if (Model.Search.Bookings.Count == 0)
+{
+    <p class="text-muted mb-0">No bookings found for <strong>@Model.Search.ResourceId</strong> in this range.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+            <thead>
+                <tr>
+                    <th scope="col">User</th>
+                    <th scope="col">Start (UTC)</th>
+                    <th scope="col">End (UTC)</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var booking in Model.Search.Bookings)
+                {
+                    var cancelRouteData = Model.ToRouteData();
+                    cancelRouteData["id"] = booking.Id.ToString();
+
+                    <tr>
+                        <td>@booking.UserId</td>
+                        <td class="text-nowrap font-monospace">@booking.StartDateTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="text-nowrap font-monospace">@booking.EndDateTime.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td>
+                            <span class="badge @(booking.IsActive ? "text-bg-success" : "text-bg-secondary")">@booking.Status</span>
+                        </td>
+                        <td class="text-end">
+                            @if (booking.IsActive)
+                            {
+                                <form asp-action="Cancel"
+                                      asp-all-route-data="@cancelRouteData"
+                                      method="post"
+                                      asp-antiforgery="false"
+                                      onsubmit="return confirm('Cancel this booking?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">&mdash;</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <partial name="_Pager" model="Model.Search" />
+}

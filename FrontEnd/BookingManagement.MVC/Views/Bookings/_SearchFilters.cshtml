@@ -1,0 +1,7 @@
+@model BookingManagement.MVC.Models.Bookings.BookingSearchViewModel
+
+<input type="hidden" name="search.ResourceId" value="@Model.ResourceId" />
+<input type="hidden" name="search.From" value="@(Model.From?.ToString("s"))" />
+<input type="hidden" name="search.To" value="@(Model.To?.ToString("s"))" />
+<input type="hidden" name="search.IncludeCancelled" value="@Model.IncludeCancelled.ToString().ToLowerInvariant()" />
+<input type="hidden" name="search.Page" value="@Model.Page" />

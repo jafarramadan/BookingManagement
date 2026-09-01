@@ -1,0 +1,26 @@
+@model BookingManagement.MVC.Models.PagedViewModel
+
+<div class="d-flex justify-content-between align-items-center pt-3">
+    <span class="text-muted small">
+        @Model.TotalCount @(Model.ItemNoun)(s) &middot; page @Model.Page of @Math.Max(Model.TotalPages, 1)
+    </span>
+    <div class="btn-group btn-group-sm">
+        @if (Model.HasPreviousPage)
+        {
+            <a class="btn btn-outline-secondary" asp-action="Index" asp-all-route-data="@Model.ToRouteData(Model.Page - 1)">Previous</a>
+        }
+        else
+        {
+            <span class="btn btn-outline-secondary disabled">Previous</span>
+        }
+
+        @if (Model.HasNextPage)
+        {
+            <a class="btn btn-outline-secondary" asp-action="Index" asp-all-route-data="@Model.ToRouteData(Model.Page + 1)">Next</a>
+        }
+        else
+        {
+            <span class="btn btn-outline-secondary disabled">Next</span>
+        }
+    </div>
+</div>

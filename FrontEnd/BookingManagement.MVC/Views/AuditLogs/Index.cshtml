@@ -1,0 +1,72 @@
+@model BookingManagement.MVC.Models.AuditLogs.AuditLogViewModel
+@{
+    ViewData["Title"] = "Audit Log";
+}
+
+<div class="mb-4">
+    <h1 class="h3 mb-1">Audit Log</h1>
+    <p class="text-muted mb-0">Every booking creation and cancellation, newest first. All times are UTC.</p>
+</div>
+
+@if (Model.ErrorMessage is not null)
+{
+    <div class="alert alert-warning" role="alert">@Model.ErrorMessage</div>
+}
+
+<section class="card">
+    <div class="card-header">Recorded events</div>
+    <div class="card-body">
+        <form asp-action="Index" method="get" class="row g-2 align-items-end mb-3">
+            <div class="col-sm-6 col-lg-5">
+                <label for="bookingId" class="form-label">Booking ID</label>
+                <input id="bookingId" name="BookingId" value="@Model.BookingId" class="form-control" placeholder="Filter by a single booking" />
+            </div>
+            <div class="col-sm-3 col-lg-2">
+                <button type="submit" class="btn btn-outline-primary w-100">Filter</button>
+            </div>
+            @if (Model.BookingId.HasValue)
+            {
+                <div class="col-sm-3 col-lg-2">
+                    <a class="btn btn-outline-secondary w-100" asp-action="Index">Clear</a>
+                </div>
+            }
+        </form>
+
+        @if (Model.AuditLogs.Count == 0)
+        {
+            <p class="text-muted mb-0">No audit events recorded yet.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Booking ID</th>
+                            <th scope="col">Event</th>
+                            <th scope="col">Resource</th>
+                            <th scope="col">User</th>
+                            <th scope="col">Date &amp; time (UTC)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var auditLog in Model.AuditLogs)
+                        {
+                            <tr>
+                                <td class="font-monospace small">@auditLog.BookingId</td>
+                                <td>
+                                    <span class="badge @(auditLog.IsCancellation ? "text-bg-secondary" : "text-bg-success")">@auditLog.EventDisplayName</span>
+                                </td>
+                                <td>@auditLog.ResourceId</td>
+                                <td>@auditLog.UserId</td>
+                                <td class="text-nowrap font-monospace">@auditLog.OccurredAt.ToString("dd MMM yyyy HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <partial name="_Pager" model="Model" />
+        }
+    </div>
+</section>

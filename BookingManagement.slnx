@@ -1,3 +1,14 @@
 <Solution>
-  <Project Path="BookingManagement/BookingManagement.csproj" />
+  <Project Path="BookingManagement.Common/BookingManagement.Common.csproj" />
+  <Folder Name="/BackEnd/">
+    <Project Path="BackEnd/BookingManagement.API/BookingManagement.API.csproj" />
+    <Project Path="BackEnd/BookingManagement.BL/BookingManagement.BL.csproj" />
+    <Project Path="BackEnd/BookingManagement.DAL/BookingManagement.DAL.csproj" />
+    <Project Path="BackEnd/BookingManagement.Domain/BookingManagement.Domain.csproj" />
+    <Project Path="BackEnd/BookingManagement.Tests/BookingManagement.Tests.csproj" />
+  </Folder>
+  <Folder Name="/FrontEnd/">
+    <Project Path="FrontEnd/BookingManagement.MVC/BookingManagement.MVC.csproj" />
+    <Project Path="FrontEnd/BookingManagement.MVC.Services/BookingManagement.MVC.Services.csproj" />
+  </Folder>
 </Solution>

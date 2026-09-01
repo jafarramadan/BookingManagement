@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\BookingManagement.Common\BookingManagement.Common.csproj" />
+    <ProjectReference Include="..\BookingManagement.DAL\BookingManagement.DAL.csproj" />
+  </ItemGroup>
+
+</Project>

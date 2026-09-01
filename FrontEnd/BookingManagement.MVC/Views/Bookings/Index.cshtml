@@ -1,0 +1,102 @@
+@model BookingManagement.MVC.Models.Bookings.DashboardViewModel
+@{
+    ViewData["Title"] = "Bookings";
+}
+
+<div class="mb-4">
+    <h1 class="h3 mb-1">Booking Management</h1>
+    <p class="text-muted mb-0">Create bookings and review them per resource. All times are UTC.</p>
+</div>
+
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="alert alert-success" role="alert">@successMessage</div>
+}
+
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-danger" role="alert">@errorMessage</div>
+}
+
+<div class="row g-4">
+    <div class="col-xl-4">
+        <section class="card h-100">
+            <div class="card-header">Create booking</div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" asp-antiforgery="false">
+                    <div asp-validation-summary="ModelOnly" class="text-danger small mb-2"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Create.ResourceId" class="form-label"></label>
+                        <input asp-for="Create.ResourceId" class="form-control" placeholder="meeting-room-1" />
+                        <span asp-validation-for="Create.ResourceId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Create.UserId" class="form-label"></label>
+                        <input asp-for="Create.UserId" class="form-control" placeholder="user-123" />
+                        <span asp-validation-for="Create.UserId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Create.StartDateTime" class="form-label"></label>
+                        <input asp-for="Create.StartDateTime" type="datetime-local" class="form-control" />
+                        <span asp-validation-for="Create.StartDateTime" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Create.EndDateTime" class="form-label"></label>
+                        <input asp-for="Create.EndDateTime" type="datetime-local" class="form-control" />
+                        <span asp-validation-for="Create.EndDateTime" class="text-danger small"></span>
+                    </div>
+
+                    <partial name="_SearchFilters" model="Model.Search" />
+
+                    <button type="submit" class="btn btn-primary w-100">Create booking</button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <div class="col-xl-8">
+        <section class="card h-100">
+            <div class="card-header">Bookings</div>
+            <div class="card-body">
+                <form asp-action="Index" method="get" class="row g-2 align-items-end mb-3">
+                    <div class="col-sm-4">
+                        <label for="searchResourceId" class="form-label">Resource ID</label>
+                        <input id="searchResourceId" name="search.ResourceId" value="@Model.Search.ResourceId" class="form-control" placeholder="meeting-room-1" />
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="searchFrom" class="form-label">From (UTC)</label>
+                        <input id="searchFrom" name="search.From" value="@(Model.Search.From?.ToString("yyyy-MM-ddTHH:mm"))" type="datetime-local" class="form-control" />
+                    </div>
+                    <div class="col-sm-3">
+                        <label for="searchTo" class="form-label">To (UTC)</label>
+                        <input id="searchTo" name="search.To" value="@(Model.Search.To?.ToString("yyyy-MM-ddTHH:mm"))" type="datetime-local" class="form-control" />
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="submit" class="btn btn-outline-primary w-100">Search</button>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input id="searchIncludeCancelled" name="search.IncludeCancelled" value="true" type="checkbox" class="form-check-input" checked="@Model.Search.IncludeCancelled" />
+                            <label for="searchIncludeCancelled" class="form-check-label">Include cancelled bookings</label>
+                        </div>
+                    </div>
+                </form>
+
+                @if (Model.Search.ErrorMessage is not null)
+                {
+                    <div class="alert alert-warning" role="alert">@Model.Search.ErrorMessage</div>
+                }
+
+                <partial name="_BookingsTable" model="Model" />
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

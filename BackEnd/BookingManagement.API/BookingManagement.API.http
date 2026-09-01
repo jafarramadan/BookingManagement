@@ -1,0 +1,55 @@
+@BookingManagement.API_HostAddress = http://localhost:5159
+
+### Health check
+GET {{BookingManagement.API_HostAddress}}/api/v1/Health/CheckIfLive
+
+### Create a booking
+POST {{BookingManagement.API_HostAddress}}/api/v1/bookings
+Content-Type: application/json
+
+{
+  "resourceId": "room-1",
+  "userId": "user-1",
+  "startDateTime": "2026-02-02T10:00:00Z",
+  "endDateTime": "2026-02-02T11:00:00Z"
+}
+
+### Create a booking that starts when the previous one ends (allowed)
+POST {{BookingManagement.API_HostAddress}}/api/v1/bookings
+Content-Type: application/json
+
+{
+  "resourceId": "room-1",
+  "userId": "user-2",
+  "startDateTime": "2026-02-02T11:00:00Z",
+  "endDateTime": "2026-02-02T12:00:00Z"
+}
+
+### Create an overlapping booking (409 Conflict)
+POST {{BookingManagement.API_HostAddress}}/api/v1/bookings
+Content-Type: application/json
+
+{
+  "resourceId": "room-1",
+  "userId": "user-3",
+  "startDateTime": "2026-02-02T10:30:00Z",
+  "endDateTime": "2026-02-02T11:30:00Z"
+}
+
+### Bookings of a resource within a date range
+GET {{BookingManagement.API_HostAddress}}/api/v1/resources/room-1/bookings?from=2026-02-02T00:00:00Z&to=2026-02-03T00:00:00Z&page=1&pageSize=50
+
+### Bookings of a resource including the cancelled ones
+GET {{BookingManagement.API_HostAddress}}/api/v1/resources/room-1/bookings?includeCancelled=true
+
+### Audit log
+GET {{BookingManagement.API_HostAddress}}/api/v1/audit-logs?page=1&pageSize=20
+
+### Audit log of a single booking
+GET {{BookingManagement.API_HostAddress}}/api/v1/audit-logs?bookingId=00000000-0000-0000-0000-000000000000
+
+### Get a single booking
+GET {{BookingManagement.API_HostAddress}}/api/v1/bookings/00000000-0000-0000-0000-000000000000
+
+### Cancel a booking
+POST {{BookingManagement.API_HostAddress}}/api/v1/bookings/00000000-0000-0000-0000-000000000000/cancel
