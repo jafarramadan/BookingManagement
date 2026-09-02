@@ -6,9 +6,9 @@ namespace BookingManagement.MVC.Models.Bookings
 {
     public class CreateBookingViewModel : IValidatableObject
     {
-        [Required(ErrorMessage = "Resource ID is required.")]
-        [StringLength(100, ErrorMessage = "Resource ID must not exceed 100 characters.")]
-        [Display(Name = "Resource ID")]
+        [Required(ErrorMessage = "Please select a resource.")]
+        [StringLength(100, ErrorMessage = "Resource must not exceed 100 characters.")]
+        [Display(Name = "Resource")]
         public string? ResourceId { get; set; }
 
         [Required(ErrorMessage = "User ID is required.")]

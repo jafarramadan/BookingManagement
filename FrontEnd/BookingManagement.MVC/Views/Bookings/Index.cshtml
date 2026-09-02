@@ -1,6 +1,10 @@
 @model BookingManagement.MVC.Models.Bookings.DashboardViewModel
 @{
     ViewData["Title"] = "Bookings";
+
+    var searchResourceId = Model.Search.ResourceId;
+    var searchResourceIsListed = Model.Resources.Any(resource =>
+        string.Equals(resource.Id, searchResourceId, StringComparison.OrdinalIgnoreCase));
 }
 
 <div class="mb-4">
@@ -18,6 +22,11 @@
     <div class="alert alert-danger" role="alert">@errorMessage</div>
 }
 
+@if (Model.ResourcesErrorMessage is not null)
+{
+    <div class="alert alert-warning" role="alert">@Model.ResourcesErrorMessage</div>
+}
+
 <div class="row g-4">
     <div class="col-xl-4">
         <section class="card h-100">
@@ -28,7 +37,13 @@
 
                     <div class="mb-3">
                         <label asp-for="Create.ResourceId" class="form-label"></label>
-                        <input asp-for="Create.ResourceId" class="form-control" placeholder="meeting-room-1" />
+                        <select asp-for="Create.ResourceId" class="form-select">
+                            <option value="">Select a resource</option>
+                            @foreach (var resource in Model.Resources)
+                            {
+                                <option value="@resource.Id">@resource.Name</option>
+                            }
+                        </select>
                         <span asp-validation-for="Create.ResourceId" class="text-danger small"></span>
                     </div>
 
@@ -52,7 +67,7 @@
 
                     <partial name="_SearchFilters" model="Model.Search" />
 
-                    <button type="submit" class="btn btn-primary w-100">Create booking</button>
+                    <button type="submit" class="btn btn-primary w-100" disabled="@(!Model.HasResources)">Create booking</button>
                 </form>
             </div>
         </section>
@@ -64,8 +79,18 @@
             <div class="card-body">
                 <form asp-action="Index" method="get" class="row g-2 align-items-end mb-3">
                     <div class="col-sm-4">
-                        <label for="searchResourceId" class="form-label">Resource ID</label>
-                        <input id="searchResourceId" name="search.ResourceId" value="@Model.Search.ResourceId" class="form-control" placeholder="meeting-room-1" />
+                        <label for="searchResourceId" class="form-label">Resource</label>
+                        <select id="searchResourceId" name="search.ResourceId" class="form-select">
+                            <option value="">Select a resource</option>
+                            @foreach (var resource in Model.Resources)
+                            {
+                                <option value="@resource.Id" selected="@string.Equals(resource.Id, searchResourceId, StringComparison.OrdinalIgnoreCase)">@resource.Name</option>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(searchResourceId) && !searchResourceIsListed)
+                            {
+                                <option value="@searchResourceId" selected>@searchResourceId (retired)</option>
+                            }
+                        </select>
                     </div>
                     <div class="col-sm-3">
                         <label for="searchFrom" class="form-label">From (UTC)</label>

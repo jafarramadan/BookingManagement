@@ -1,6 +1,7 @@
 using BookingManagement.MVC.Helpers;
 using BookingManagement.MVC.Models.Bookings;
 using BookingManagement.MVC.Services.Bookings;
+using BookingManagement.MVC.Services.Resources;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookingManagement.MVC.Controllers
@@ -8,10 +9,14 @@ namespace BookingManagement.MVC.Controllers
     public class BookingsController : Controller
     {
         private readonly IBookingAppService _bookingAppService;
+        private readonly IResourceAppService _resourceAppService;
 
-        public BookingsController(IBookingAppService bookingAppService)
+        public BookingsController(
+            IBookingAppService bookingAppService,
+            IResourceAppService resourceAppService)
         {
             _bookingAppService = bookingAppService;
+            _resourceAppService = resourceAppService;
         }
 
         [HttpGet]
@@ -76,12 +81,30 @@ namespace BookingManagement.MVC.Controllers
                 Search = search
             };
 
+            await LoadResourcesAsync(dashboard);
+
             if (search.HasResourceId)
             {
                 await LoadBookingsAsync(search);
             }
 
             return dashboard;
+        }
+
+        private async Task LoadResourcesAsync(DashboardViewModel dashboard)
+        {
+            var result = await _resourceAppService.GetAllAsync();
+
+            if (!result.IsSuccess || result.Data is null)
+            {
+                dashboard.ResourcesErrorMessage = ApiFailureMessages.Query(
+                    result,
+                    "The list of resources could not be loaded.");
+
+                return;
+            }
+
+            dashboard.Resources = result.Data;
         }
 
         private async Task LoadBookingsAsync(BookingSearchViewModel search)

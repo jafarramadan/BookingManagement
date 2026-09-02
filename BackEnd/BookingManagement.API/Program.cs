@@ -3,6 +3,7 @@ using BookingManagement.API.Middleware;
 using BookingManagement.API.ModelBinding;
 using BookingManagement.BL.Implementation;
 using BookingManagement.BL.Interfaces;
+using BookingManagement.Common.DTOs.V1;
 using BookingManagement.DAL.Implementation;
 using BookingManagement.DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,8 @@ builder.Services.AddDbContext<BookingDbContext>(options =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
+builder.Services.AddSingleton<IResourceCatalog>(_ =>
+    new ResourceCatalog(builder.Configuration.GetSection("Resources").Get<List<ResourceDto>>() ?? []));
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IAuditLogService, AuditLogService>();
 

@@ -13,10 +13,19 @@ namespace BookingManagement.API.Controllers.V1
     public class ResourcesController : ControllerBase
     {
         private readonly IBookingService _bookingService;
+        private readonly IResourceCatalog _resourceCatalog;
 
-        public ResourcesController(IBookingService bookingService)
+        public ResourcesController(IBookingService bookingService, IResourceCatalog resourceCatalog)
         {
             _bookingService = bookingService;
+            _resourceCatalog = resourceCatalog;
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(IReadOnlyList<ResourceDto>), StatusCodes.Status200OK)]
+        public IActionResult GetResources()
+        {
+            return Ok(_resourceCatalog.GetAll());
         }
 
         [HttpGet("{resourceId}/bookings")]

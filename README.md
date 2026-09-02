@@ -11,6 +11,7 @@ what and when, and makes sure the same resource cannot be booked twice for the s
 You can:
 
 * create a booking (resource, user, start and end, all in UTC),
+* pick the resource from a fixed list rather than typing its name,
 * list the bookings of a resource, with a date filter and paging,
 * cancel a booking,
 * read an audit trail of every booking created or cancelled (the *Auditability* extension).
@@ -19,6 +20,10 @@ There are two applications. The **API** owns all the rules and is the only one t
 database. The **MVC app** is just the user interface: it has no rules and no database access, and calls
 the API over HTTP. The API base URL comes from `appsettings.json` (`ApiSettings:BaseUrl`), so it is not
 hardcoded.
+
+**Resources come from a fixed list.** They live in the API's `appsettings.json` and are served by
+`GET /api/v1/resources`. Both forms in the MVC app fill their dropdown from it, so nobody has to know
+how a room is spelled. Adding a resource is a config change and a restart, no deployment of the UI.
 
 **Creating a booking, end to end:** the user fills the form → the MVC app sends
 `POST /api/v1/bookings` → the API validates the input → the API asks the database whether an active
@@ -40,7 +45,8 @@ BookingManagement.Common      DTOs, PagedResult<T>, ApiResult<T>, enums, excepti
 BackEnd/
   BookingManagement.API       Controllers, error-handling middleware, DI setup. No rules here.
         ↓
-  BookingManagement.BL        The rules: validation, the overlap check, cancelling, audit records.
+  BookingManagement.BL        The rules: validation, the overlap check, cancelling, audit records,
+                              and the catalog of bookable resources.
         ↓
   BookingManagement.DAL       EF Core: BookingDbContext, repositories, unit of work, migrations.
         ↓
@@ -80,6 +86,7 @@ shapes, but no behaviour: the API stays the single source of truth for every rul
 | `GET` | `/api/v1/bookings/{id}` | One booking |
 | `POST` | `/api/v1/bookings/{id}/cancel` | Cancel a booking |
 | `GET` | `/api/v1/resources/{resourceId}/bookings` | A resource's bookings — `from`, `to`, `includeCancelled`, `page`, `pageSize` |
+| `GET` | `/api/v1/resources` | The bookable resources, for the dropdowns |
 | `GET` | `/api/v1/audit-logs` | The audit trail — `bookingId`, `page`, `pageSize` |
 
 All times are UTC ISO 8601 with a `Z` suffix. Swagger is at `http://localhost:5159/swagger`.
@@ -139,6 +146,9 @@ I did it this way because it is how people actually book rooms. If your meeting 
 not block mine starting at 11:00. I also kept the condition in one place,
 `BookingSpecifications.ActiveOverlapping`, so EF Core turns it into SQL and the unit tests use the same
 code. If I had written it twice the two copies could drift apart.
+
+The comparison on the resource is exact, on purpose. A "contains" match would make "Room 1" clash with
+"Room 10", which is why the UI picks the resource from a dropdown instead of searching for it by name.
 
 ### B. What did you assume about concurrency?
 
@@ -215,6 +225,10 @@ status, it does not delete anything, so the audit trail stays honest.
 The rest I kept simple on purpose: offset paging, exceptions and one middleware instead of returning a
 result object from every method, no cache, no background jobs. It is an internal tool with a small
 amount of data, so most of that would just be extra code to look after.
+
+Resources are the same kind of call. They are a list in configuration, not a table, because today they
+are only a name and an id. The day they need an owner, a capacity or opening hours, `ResourceCatalog`
+becomes a table and a repository and nothing above it changes.
 
 Performance I only thought about where it was cheap, which is the index for the overlap check and
 paging so lists are not loaded whole.

@@ -15,7 +15,7 @@ namespace BookingManagement.MVC.Models.Bookings
 
         public override string ItemNoun => "booking";
 
-        [Display(Name = "Resource ID")]
+        [Display(Name = "Resource")]
         public string? ResourceId { get; set; }
 
         [Display(Name = "From (UTC)")]

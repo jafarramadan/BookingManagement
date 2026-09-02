@@ -2,11 +2,11 @@
 
 @if (!Model.Search.HasResourceId)
 {
-    <p class="text-muted mb-0">Enter a resource ID and search to list its bookings.</p>
+    <p class="text-muted mb-0">Choose a resource and search to list its bookings.</p>
 }
 else if (Model.Search.Bookings.Count == 0)
 {
-    <p class="text-muted mb-0">No bookings found for <strong>@Model.Search.ResourceId</strong> in this range.</p>
+    <p class="text-muted mb-0">No bookings found for <strong>@Model.DisplayNameFor(Model.Search.ResourceId)</strong> in this range.</p>
 }
 else
 {

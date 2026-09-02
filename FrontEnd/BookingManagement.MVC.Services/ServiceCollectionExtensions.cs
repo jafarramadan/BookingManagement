@@ -1,6 +1,7 @@
 using BookingManagement.MVC.Services.AuditLogs;
 using BookingManagement.MVC.Services.Bookings;
 using BookingManagement.MVC.Services.Configuration;
+using BookingManagement.MVC.Services.Resources;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -15,6 +16,7 @@ namespace BookingManagement.MVC.Services
 
             services.AddHttpClient<IBookingAppService, BookingAppService>(ConfigureApiClient);
             services.AddHttpClient<IAuditLogAppService, AuditLogAppService>(ConfigureApiClient);
+            services.AddHttpClient<IResourceAppService, ResourceAppService>(ConfigureApiClient);
 
             return services;
         }
