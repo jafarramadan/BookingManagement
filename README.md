@@ -22,8 +22,7 @@ the API over HTTP. The API base URL comes from `appsettings.json` (`ApiSettings:
 hardcoded.
 
 **Resources come from a fixed list.** They live in the API's `appsettings.json` and are served by
-`GET /api/v1/resources`. Both forms in the MVC app fill their dropdown from it, so nobody has to know
-how a room is spelled. Adding a resource is a config change and a restart, no deployment of the UI.
+`GET /api/v1/resources`.
 
 **Creating a booking, end to end:** the user fills the form → the MVC app sends
 `POST /api/v1/bookings` → the API validates the input → the API asks the database whether an active
@@ -60,23 +59,6 @@ FrontEnd/
   BookingManagement.MVC.Services  BookingAppService / AuditLogAppService — the only code that
                                   speaks HTTP, plus their interfaces.
 ```
-
-Each backend layer only knows about the one below it. The split is worth having because the compiler
-enforces it: `BL` has no reference to EF Core, so business logic cannot quietly run a database query,
-and the API cannot return an EF entity because controllers only ever see the DTOs in `Common`.
-
-**A request to `POST /api/v1/bookings`:**
-
-1. `BookingsController` receives it and calls `IBookingService`. That is all it does.
-2. `BookingService` validates the input, asks the repository whether an active booking overlaps, and
-   if not creates the `Booking` plus a `BookingCreated` audit record.
-3. `BookingRepository` runs the overlap check as SQL. `IUnitOfWork.SaveChangesAsync()` then saves the
-   booking and its audit row in one `SaveChanges`, so either both are written or neither is.
-4. If a rule fails the service throws, and `ExceptionHandlingMiddleware` turns it into a `400`, `404`
-   or `409` JSON response — so there is no `try/catch` in the controllers.
-
-The MVC app sits outside that chain and reaches the API only over HTTP. It shares `Common` for the data
-shapes, but no behaviour: the API stays the single source of truth for every rule.
 
 ### API endpoints
 
